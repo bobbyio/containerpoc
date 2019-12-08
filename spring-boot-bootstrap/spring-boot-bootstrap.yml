@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: spring-boot-bootstrap
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: spring-boot-bootstrap
+    spec:
+      containers:
+      - name: spring-boot-bootstrap
+        image: biranio/gs-spring-boot-docker:latest
+        resources:
+          requests:
+            memory: 500Mi
