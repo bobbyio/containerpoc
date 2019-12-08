@@ -1,18 +1,54 @@
-apiVersion: extensions/v1beta1
-kind: Deployment
+apiVersion: v1
+kind: Template
 metadata:
   name: spring-boot-bootstrap
-  namespace: default
-spec:
-  replicas: 1
-  template:
+objects:
+  - apiVersion: extensions/v1beta1
+    kind: Deployment
     metadata:
+      name: spring-boot-bootstrap
+      namespace: default
+    spec:
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            app: spring-boot-bootstrap
+        spec:
+          containers:
+            - name: spring-boot-bootstrap
+              image: biranio/gs-spring-boot-docker:latest
+              resources:
+                requests:
+                  memory: 500Mi
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: spring-boot-bootstrap
+    spec:
+      ports:
+        - port: 8080
+          protocol: TCP
+          targetPort: 8089
+      selector:
+        app: spring-boot-bootstrap
+      sessionAffinity: None
+      type: ClusterIP
+    status:
+      loadBalancer: {}
+  - apiVersion: v1
+    kind: Route
+    metadata:
+      annotations:
+        openshift.io/host.generated: "true"
       labels:
         app: spring-boot-bootstrap
+        application: spring-boot-bootstrap
+      name: spring-boot-bootstrap
     spec:
-      containers:
-      - name: spring-boot-bootstrap
-        image: biranio/gs-spring-boot-docker:latest
-        resources:
-          requests:
-            memory: 500Mi
+      path: ""
+      to:
+        kind: Service
+        name: spring-boot-bootstrap
+        weight: 100
+      wildcardPolicy: None
